@@ -5,17 +5,14 @@ using UnityEngine;
 public class Waypoint : MonoBehaviour
 {
     public bool isExplored = false; //для алгоритма поиска пути, чтоб не просчитывать уже отработанные вэйпойнты
-    public Waypoint exploredFrom;
-
+    public Waypoint exploredFrom; //для определения клетки, с которой нашли соседние
     const int gridSize = 10;
     Vector2Int waypointPos;
-   
     public int GetGridSize()
     {
         return gridSize;
     }
-
-    public Vector2Int GetWaypointPos()
+    public Vector2Int GetWaypointPos() //получаем округленную позицию вэйпойнта
     {
         return new Vector2Int(
         waypointPos.x = Mathf.RoundToInt(transform.position.x / gridSize), /*берем значение по х, делим на размер сетки (он равен размеру Scale, но может быть меньше, 
@@ -23,7 +20,7 @@ public class Waypoint : MonoBehaviour
         waypointPos.y = Mathf.RoundToInt(transform.position.z / gridSize));
     }
 
-    public void SetTopColor(Color color)
+    public void SetTopColor(Color color) //устанавливаем цвет верха кубика вэйпойнта
     {
         MeshRenderer topMeshRenderer = transform.Find("Top").GetComponent<MeshRenderer>();
         topMeshRenderer.material.color = color;
