@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class Pathfinder : MonoBehaviour
@@ -23,10 +19,13 @@ public class Pathfinder : MonoBehaviour
 
     public List<Waypoint> GetPath() //getter для Пути, чтобы передать путь объекту - вызывается в EnemyMovement
     {
-        LoadBlocks(); //загрузка всех вэйпойнтов
-        BreadthFirstSearch(); //выполняем поиск пути
-        CreatePath(); //создаем Путь
-        return path; //передаем найденный Путь
+        if (path.Count == 0) //проверка, что еще не создан ни один путь
+        {
+            LoadBlocks(); //загрузка всех вэйпойнтов
+            BreadthFirstSearch(); //выполняем поиск пути
+            CreatePath(); //создаем Путь
+        }
+        return path;
     }
     private void LoadBlocks() // добавляем в список вэйпойнты с проверкой, не накладываются ли они друг на друга
     {
