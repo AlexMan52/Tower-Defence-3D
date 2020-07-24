@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
 [ExecuteInEditMode] //в editor делаем снаппинг через скрипт
 [SelectionBase] //чтобы выбирать весь куб, а не лейбл
@@ -16,14 +13,14 @@ public class CubeEditor : MonoBehaviour
     void Update()
     {
         SnapToGrid();
-        UpdateLabel();
+        //UpdateLabel();
     }
     private void SnapToGrid() //привязываем куб к сетке, чтобы при перемещении двигать по этой сетке координат
     {
         int gridSize = waypoint.GetGridSize();
-        transform.position = new Vector3(waypoint.GetWaypointPos().x * gridSize, 0f, waypoint.GetWaypointPos().y * gridSize); // присваиваем занчение позиции объекту
+        transform.position = new Vector3(waypoint.GetWaypointPos().x * gridSize, 0f, waypoint.GetWaypointPos().y * gridSize); // присваиваем значение позиции объекту
     }
-    private void UpdateLabel() // Присваиваем тексту на каждом кубе значение координат (x,z)
+    /*private void UpdateLabel() // Присваиваем тексту на каждом кубе значение координат (x,z)
     {
         TextMesh labelTextMesh = GetComponentInChildren<TextMesh>();
         string labelText = 
@@ -32,5 +29,5 @@ public class CubeEditor : MonoBehaviour
             (waypoint.GetWaypointPos().y).ToString() + "]";
         labelTextMesh.text = labelText;
         gameObject.name = labelText; // переименовываем сам куб
-    }
+    }*/
 }

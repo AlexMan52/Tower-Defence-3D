@@ -29,8 +29,8 @@ public class Pathfinder : MonoBehaviour
     }
     private void LoadBlocks() // добавляем в список вэйпойнты с проверкой, не накладываются ли они друг на друга
     {
-        var waypoints = FindObjectsOfType<Waypoint>(); //находим все вэйпойнты и создаем из них массив
-        foreach (Waypoint waypoint in waypoints) //для каждого вэйпойнта из массива:
+        var waypoints = FindObjectsOfType<Waypoint>();
+        foreach (Waypoint waypoint in waypoints) 
         {
             var waypointPos = waypoint.GetWaypointPos(); //получаем координаты позиции
             if (grid.ContainsKey(waypointPos)) // если в Словаре уже есть вэйпойнт с такими координатами, то ничего не загружаем (чтобы в Словаре не дублировались случайно созданные в одном месте кубы)
@@ -46,7 +46,7 @@ public class Pathfinder : MonoBehaviour
     private void BreadthFirstSearch() //алгоритм поиска пути
     {
         queue.Enqueue(startWaypoint); // добавляем в Очередь стартовую точку
-        startWaypoint.SetTopColor(Color.yellow); //даем цвет стартовой точке
+        //startWaypoint.SetTopColor(Color.yellow);
         while (queue.Count > 0 && isRunning) //пока в Очереди что-то есть и выполняется булевое значение 
         {
             currentSearchCenter = queue.Dequeue(); //передаем значение центру поиска равное тому, что мы убираем из очереди (т.е. стартовой точки)
@@ -58,9 +58,9 @@ public class Pathfinder : MonoBehaviour
     }
     private void HaltIfFoundEnd() //останавливаем, если нашли финиш
     {
-        if (currentSearchCenter == finishWaypoint) //проверяем, что текущий центр поиска равен финишной точке
+        if (currentSearchCenter == finishWaypoint)
         {
-            finishWaypoint.SetTopColor(Color.red); //даем цвет финишной точке
+            //finishWaypoint.SetTopColor(Color.red);
             isRunning = false; //меняем булевое значение, чтобы предотвратить выполнение ExploreNeighbours из цикла while в BreadthFirstSearch
         }
     }
@@ -72,7 +72,7 @@ public class Pathfinder : MonoBehaviour
             Vector2Int neighbourPos = currentSearchCenter.GetWaypointPos() + direction; //получаем значения координат всех соседних клеток поочереди
             if (grid.ContainsKey(neighbourPos)) //если в Словаре есть вэйпойнты с такими координатами, то
             {
-                QueueNewNeighbour(neighbourPos); //запускаем метод по добавлению в очередь на проверку соседней клетки (с передаваемыми координатами)
+                QueueNewNeighbour(neighbourPos); //добавляем клетку в очередь на проверку
             }
         }
     }
@@ -90,15 +90,18 @@ public class Pathfinder : MonoBehaviour
     }
     private void CreatePath() // создаем динамический массив с вэйпойнтами от финиша до старта, затем разворачиваем и получаем путь
     {
+        var pathColor = new Color(0.3f, 0.1f, 0.1f);
         path.Add(finishWaypoint); // добавляем финишную точку в Путь
         Waypoint previous = finishWaypoint.exploredFrom; //создаем переменную, которая показывает предыдущий объект при поиске пути 
         while (previous != startWaypoint) //пока предыдущий объект не равен стартовой точке
         {
+            previous.SetTopColor(pathColor);
             path.Add(previous); //добавляем в Путь предыдущий объект
             previous = previous.exploredFrom; //ищем предыдущий объект для уже добавленного в Путь
         }
         path.Add(startWaypoint); // добавляем стартовый вэйпойнт
         path.Reverse(); //разворачиваем массив
+        
     }
 
    

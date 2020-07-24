@@ -5,18 +5,24 @@ using UnityEngine;
 public class Tower : MonoBehaviour
 {
     [SerializeField] GameObject objectToPan;
-    //[SerializeField] GameObject targetEnemy;
-    GameObject targetEnemy;
+    Enemy targetEnemy;
     [Tooltip("NumOfCubes for shooting range")] [SerializeField] int xRange = 2;
     [Tooltip("NumOfCubes for shooting range")] [SerializeField] int yRange = 2;
     public int damage = 33;
     float gridSize;
     float shootingRange;
-    bool isActive = false;
     float distanceToClosestEnemySquared;
+
+    
+    AudioSource shootingSound;
+
+    public TowerWaypoint baseWaypoint;
+
     private void Start()
     {
         SetShootingRange();
+        shootingSound = GetComponentInChildren<AudioSource>();
+        
     }
 
     private void SetShootingRange()
@@ -24,9 +30,8 @@ public class Tower : MonoBehaviour
         var waypoint = FindObjectOfType<Waypoint>();
         gridSize = waypoint.GetGridSize();
         // !!! Для 1 варианта из Shooting: shootingRange = new Vector2(xRange * gridSize, yRange * gridSize).Magnitude;
-        //Для 2 варианта берем квадрат shootingRange:
+        //Для 2 варианта берем квадрат shootingRange, (потому что быстрее обработка в Unity!):
         shootingRange = new Vector2(xRange * gridSize, yRange * gridSize).sqrMagnitude;
-        print("Distance to shoot = " + shootingRange);
     }
 
     void Update()
@@ -41,37 +46,35 @@ public class Tower : MonoBehaviour
         {
             Shooting(false);
         }
-        
     }
 
     void SetTargetEnemy() //находим ближайшего врага
     {
-        var enemiesOnField = FindObjectsOfType<Enemy>(); //ищем всех врагов на уровне
-        if (enemiesOnField.Length == 0) { return; } //если их нет, то нет цели
+        var enemiesOnField = FindObjectsOfType<Enemy>(); 
+        if (enemiesOnField.Length == 0) { return; } //если нет врагов, то нет цели
 
-        GameObject closestEnemy = enemiesOnField[0].gameObject; //по умолчанию ставим первого врага как ближайшего
+        Enemy closestEnemy = enemiesOnField[0]; //по умолчанию ставим первого врага как ближайшего
 
-        foreach (Enemy testEnemy in enemiesOnField) //для каждого найденного врага в массиве проводим проверку на расстояние
+        foreach (Enemy testEnemy in enemiesOnField) //проводим проверку на расстояние
         {
-            closestEnemy = GetClosestEnemy(closestEnemy, testEnemy.gameObject); //получаем ближайшего врага из соседней функции
+            closestEnemy = GetClosestEnemy(closestEnemy, testEnemy); //получаем ближайшего врага из GetClosestEnemy
         }
-        targetEnemy = closestEnemy; //ставим цель на ближайшего врага
+        targetEnemy = closestEnemy;
     }
 
-    private GameObject GetClosestEnemy(GameObject closestEnemy, GameObject testEnemy) //передаем ближайшего врага и тестируемого из массива
+    private Enemy GetClosestEnemy(Enemy closestEnemy, Enemy testEnemy) //передаем ближайшего врага и тестируемого из массива
     {
         if ((gameObject.transform.position - testEnemy.transform.position).sqrMagnitude <  //если до тестируемого расстояние меньше, чем до ближайшего
             (gameObject.transform.position - closestEnemy.transform.position).sqrMagnitude)
         {
-            closestEnemy = testEnemy; //делаем ближайшего врага равного тестируемому
+            closestEnemy = testEnemy;
         }
-        return closestEnemy; // возвращаем значение ближайшего врага
+        return closestEnemy;
     }
-
 
     void LookAtTarget()
     {
-        objectToPan.transform.LookAt(targetEnemy.transform);
+        objectToPan.transform.LookAt(targetEnemy.transform); //крутим пушку башни на врага
     }
     void FireAtEnemy()
     {
@@ -84,9 +87,9 @@ public class Tower : MonoBehaviour
 
         // !!! Второй вариант расчета дистанции до цели, с sqr.magnitude
 
-        Vector2 distanceVector = new Vector2(targetEnemy.transform.position.x - objectToPan.transform.position.x, // вектор расстояния до цели
-                                            targetEnemy.transform.position.z - objectToPan.transform.position.z);
-        float distanceToClosestEnemySquared = distanceVector.sqrMagnitude; //значение отрезка до цели
+        Vector2 distanceVector = new Vector2(targetEnemy.transform.position.x - gameObject.transform.position.x, // вектор расстояния до цели
+                                            targetEnemy.transform.position.z - gameObject.transform.position.z);
+        distanceToClosestEnemySquared = distanceVector.sqrMagnitude; //значение отрезка до цели
         if (distanceToClosestEnemySquared <= shootingRange) //проверка что расстояние до цели входит в область поражения
         {
             Shooting(true);
@@ -97,11 +100,11 @@ public class Tower : MonoBehaviour
         }
     }
 
-    void Shooting(bool isActive) //сама стрельба, чтобы выключить при уничтожении цели
+    void Shooting(bool isActive) //сама стрельба, с выключением при уничтожении цели
     {
         var bulletEmission = GetComponentInChildren<ParticleSystem>().emission;
         bulletEmission.enabled = isActive;
+        shootingSound.enabled = isActive;
     }
-
 
 }
